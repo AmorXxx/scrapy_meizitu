@@ -13,7 +13,7 @@ class MeizituSpider(scrapy.spiders.Spider):
         pic_src = response.xpath('/html/body/div[2]/div[1]/div[3]/p/a/img/@src').extract()[0]
         file_path = pic_name + '.jpg'
         yield scrapy.Request(pic_src, meta={'file_path': file_path}, callback=self.imageDownload)
-        next_url = response.xpath('/html/body/div[2]/div[1]/div[4]/a[6]/@href').extract()[0]
+        next_url = response.xpath('/html/body/div[2]/div[1]/div[4]/a/@href').extract()[-1]
         if next_url:
            yield scrapy.Request(next_url)
 
