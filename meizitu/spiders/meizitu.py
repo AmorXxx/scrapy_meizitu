@@ -1,6 +1,6 @@
 import scrapy
-from meizitu.items import MeizituItem
 import os
+import re
 
 
 class MeizituSpider(scrapy.spiders.Spider):
@@ -11,13 +11,21 @@ class MeizituSpider(scrapy.spiders.Spider):
     def parse(self, response):
         pic_name = response.xpath('/html/body/div[2]/div[1]/h2/text()').extract()[0]
         pic_src = response.xpath('/html/body/div[2]/div[1]/div[3]/p/a/img/@src').extract()[0]
-        file_path = pic_name + '.jpg'
-        yield scrapy.Request(pic_src, meta={'file_path': file_path}, callback=self.imageDownload)
+        file_name = pic_name + '.jpg'
+        folder_name = response.xpath('/html/body/div[2]/div[1]/h2/text()').extract()[0]
+        base_path = os.path.join("pic", re.sub('（.*?）', '', folder_name))
+        if not os.path.exists(base_path):
+            os.makedirs(base_path)
+        yield scrapy.Request(pic_src, meta={'file_path': file_name, 'base_path': base_path},
+                             callback=self.imageDownload)
         next_url = response.xpath('/html/body/div[2]/div[1]/div[4]/a/@href').extract()[-1]
         if next_url:
-           yield scrapy.Request(next_url)
+            yield scrapy.Request(next_url)
 
     def imageDownload(self, response):
-            file_path = response.meta['file_path']
-            with open(file_path, 'wb') as f:
-                f.write(response.body)
+        file_name = response.meta['file_path']
+        base_path = response.meta['base_path']
+        os.chdir(base_path)
+        with open(file_name, 'wb') as f:
+            f.write(response.body)
+        os.chdir('C:\meizitu\scrapy_meizitu')
