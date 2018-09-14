@@ -6,7 +6,7 @@ import re
 class MeizituSpider(scrapy.spiders.Spider):
     name = 'meizitu'  # 爬虫名
     allowed_domians = ["http://www.mzitu.com"]  # 允许域名列表
-    start_urls = ['http://www.mzitu.com/150001']  # 起始链接列表
+    start_urls = ['http://www.mzitu.com/150067']  # 起始链接列表
 
     def parse(self, response):
         pic_name = response.xpath('/html/body/div[2]/div[1]/h2/text()').extract()[0]
